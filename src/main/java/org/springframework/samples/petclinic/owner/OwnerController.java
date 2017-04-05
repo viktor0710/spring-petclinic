@@ -84,9 +84,16 @@ class OwnerController {
         if (owner.getLastName() == null) {
             owner.setLastName(""); // empty string signifies broadest possible search
         }
+        if (owner.getFirstName() == null) {
+            owner.setFirstName(""); // empty string signifies broadest possible search
+        }
+        if (owner.getPetName() == null) {
+            owner.setPetName(""); // empty string signifies broadest possible search
+        }
 
         // find owners by last name
-        Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
+        //Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
+        Collection<Owner> results = this.owners.findByLastNameAndFirstNameAndPetName(owner.getLastName(), owner.getFirstName());
         if (results.isEmpty()) {
             // no owners found
             result.rejectValue("lastName", "notFound", "not found");
