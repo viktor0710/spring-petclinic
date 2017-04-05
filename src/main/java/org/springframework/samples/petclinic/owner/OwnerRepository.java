@@ -51,12 +51,12 @@ public interface OwnerRepository extends Repository<Owner, Integer> {
      * @return a Collection of matching {@link Owner}s (or an empty Collection if none
      * found)
      */
-    @Query("SELECT DISTINCT owner FROM Owner owner left join fetch owner.pets WHERE owner.lastName LIKE :lastName% and owner.firstName LIKE :firstName%")
+    @Query("SELECT DISTINCT owner FROM Owner owner left join fetch owner.pets p WHERE owner.lastName LIKE :lastName% and owner.firstName LIKE :firstName% and p.name LIKE :petName%")
     @Transactional(readOnly = true)
     Collection<Owner> findByLastNameAndFirstNameAndPetName(
     		@Param("lastName") String lastName, 
-    		@Param("firstName") String firstName
-    		//@Param("petName") String petName
+    		@Param("firstName") String firstName,
+    		@Param("petName") String petName
     		);
 
     /**
