@@ -21,7 +21,9 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -92,7 +95,6 @@ class OwnerController {
         }
 
         // find owners by last name
-        //Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
         Collection<Owner> results = this.owners.findByLastNameAndFirstNameAndPetName(owner.getLastName(), owner.getFirstName(), owner.getPetName());
         if (results.isEmpty()) {
             // no owners found
@@ -133,11 +135,22 @@ class OwnerController {
      * @param ownerId the ID of the owner to display
      * @return a ModelMap with the model attributes for the view
      */
-    @RequestMapping("/owners/{ownerId}")
+    @RequestMapping(value = "/owners/{ownerId}", method = RequestMethod.GET)
     public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
         ModelAndView mav = new ModelAndView("owners/ownerDetails");
         mav.addObject(this.owners.findById(ownerId));
         return mav;
+    }
+    
+    /**
+     * Custom handler for deleting an owner.
+     *
+     * @param ownerId the ID of the owner to delete
+     */
+    @RequestMapping(value = "/owners/{ownerId}", method = RequestMethod.DELETE)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteOwner(@PathVariable("ownerId") int ownerId) {
+    	this.owners.removeOwnerByid(ownerId);
     }
 
 }

@@ -25,9 +25,36 @@
               <td th:text="${owner.city}"/>
               <td th:text="${owner.telephone}"/>
               <td><span th:each="pet : ${owner.pets}" th:text="${pet.name} "/></td>
+              <td>
+              	<!-- <form action="#" th:object="${owner}" th:action="@{owners/__${owner.id}__}" th:method="delete">
+              		<input type="hidden" name="_method" value="delete" />
+              		<input type ="submit" value = "Delete"/>
+              	</form> -->
+              	
+				<button class="deleteOwner btn btn-primary" th:data-ownerId="${owner.id}">Delete</button>
+              </td>
           </tr>
         </tbody>
     </table>
 
+  <script>
+	$( document ).ready(function() {
+	    console.log( "ready!" );
+		$( ".deleteOwner" ).click(function( event ) {
+				$.ajax({
+				    url: "owners/" + $(event.target).data("ownerid"),
+				    type: 'DELETE',
+				    success: function(result) {
+				    	$(event.target).parent().parent().remove()
+				    },
+				    error: function (xhr, ajaxOptions, thrownError) {
+				        console.log(xhr.status);
+				        console.log(thrownError);
+				      }
+				});
+			  event.preventDefault();
+		});
+	});
+	</script>
   </body>
 </html>
