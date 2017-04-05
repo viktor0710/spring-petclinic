@@ -1,10 +1,14 @@
 package org.springframework.samples.petclinic.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import java.util.Collection;
 import java.util.Date;
 
+import org.assertj.core.api.AssertFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,13 +63,49 @@ public class ClinicServiceTests {
 
     @Autowired
     protected VetRepository vets;
-
+    
     @Test
     public void shouldFindOwnersByLastName() {
         Collection<Owner> owners = this.owners.findByLastName("Davis");
         assertThat(owners.size()).isEqualTo(2);
 
         owners = this.owners.findByLastName("Daviss");
+        assertThat(owners.isEmpty()).isTrue();
+    }
+    
+    @Test
+    public void shouldFindOwnersByFirstName() {
+        Collection<Owner> owners = this.owners.findByLastNameAndFirstNameAndPetName("", "Betty", "");
+        assertThat(owners.size()).isEqualTo(1);
+
+        owners = this.owners.findByLastNameAndFirstNameAndPetName("", "Bettyy", "");
+        assertThat(owners.isEmpty()).isTrue();
+    }
+    
+    @Test
+    public void shouldFindOwnersByPetName() {
+        Collection<Owner> owners = this.owners.findByLastNameAndFirstNameAndPetName("", "", "Basil");
+        assertThat(owners.size()).isEqualTo(1);
+
+        owners = this.owners.findByLastNameAndFirstNameAndPetName("", "", "Basill");
+        assertThat(owners.isEmpty()).isTrue();
+    }
+    
+    @Test
+    public void shouldFindOwnersByLastNameAndFirstNameAndPetName() {
+        Collection<Owner> owners = this.owners.findByLastNameAndFirstNameAndPetName("Davis", "", "Basil");
+        assertThat(owners.size()).isEqualTo(1);
+        
+        owners = this.owners.findByLastNameAndFirstNameAndPetName("", "Betty", "Basil");
+        assertThat(owners.size()).isEqualTo(1);
+        
+        owners = this.owners.findByLastNameAndFirstNameAndPetName("Davis", "", "Basil");
+        assertThat(owners.size()).isEqualTo(1);
+        
+        owners = this.owners.findByLastNameAndFirstNameAndPetName("Davis", "Betty", "Basil");
+        assertThat(owners.size()).isEqualTo(1);
+
+        owners = this.owners.findByLastNameAndFirstNameAndPetName("", "", "Basill");
         assertThat(owners.isEmpty()).isTrue();
     }
 
@@ -111,6 +151,14 @@ public class ClinicServiceTests {
         owner = this.owners.findById(1);
         assertThat(owner.getLastName()).isEqualTo(newLastName);
     }
+    
+    @Test
+    @Transactional
+    public void shouldRemoveOwnerById() throws Exception {
+    	this.owners.removeOwnerByid(1);
+    	Owner owner = this.owners.findById(1);
+    	assertThat(owner, is(nullValue()));
+    }
 
     @Test
     public void shouldFindPetWithCorrectId() {
@@ -128,6 +176,12 @@ public class ClinicServiceTests {
         assertThat(petType1.getName()).isEqualTo("cat");
         PetType petType4 = EntityUtils.getById(petTypes, PetType.class, 4);
         assertThat(petType4.getName()).isEqualTo("snake");
+        PetType petType7 = EntityUtils.getById(petTypes, PetType.class, 7);
+        assertThat(petType7.getName()).isEqualTo("crocodile");
+        PetType petType8 = EntityUtils.getById(petTypes, PetType.class, 8);
+        assertThat(petType8.getName()).isEqualTo("dingo");
+        PetType petType9 = EntityUtils.getById(petTypes, PetType.class, 9);
+        assertThat(petType9.getName()).isEqualTo("kangaroo");
     }
 
     @Test
@@ -202,5 +256,4 @@ public class ClinicServiceTests {
         assertThat(visitArr[0].getDate()).isNotNull();
         assertThat(visitArr[0].getPetId()).isEqualTo(7);
     }
-
 }
